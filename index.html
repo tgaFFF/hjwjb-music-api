@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HJWJB音乐</title>
+    <link rel="icon" href="IMG_20251115_090141.png" type="image/png">
+    <link rel="stylesheet" href="style.css?v=20260207v7">
+    <script>
+        document.documentElement.classList.add('js');
+        try {
+            const rawMotion = String(localStorage.getItem('hjwjb_motion_enabled_v1') || '').trim().toLowerCase();
+            if (rawMotion === 'false') document.documentElement.classList.add('motion-off');
+        } catch (e) {
+            // ignore
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="page-enter app-page stream-light-off">
+    <!-- 弹幕公告容器 -->
+    <div class="barrage-container" id="barrage-container">
+        <!-- 弹幕将由JavaScript动态生成 -->
+    </div>
+    <!-- 顶部导航区域 -->
+    <header class="header">
+        <div class="header-left">
+            <img src="tx.png" alt="头像" class="avatar">
+            <h1 class="title">HJWJB音乐</h1>
+        </div>
+        <div class="search-container">
+            <a href="search.html" class="search-btn" target="_blank" rel="noopener">
+                <i class="fas fa-search"></i> 搜索
+            </a>
+        </div>
+        
+        <div class="header-right">
+            <div class="api-switch-container">
+                <label for="api-select">选择API：</label>
+                <select id="api-select" class="api-select">
+                    <option value="api3">API 3</option>
+                    <option value="api4">API 4</option>
+                    <option value="api7">API 7</option>
+                    <option value="api8">API 8</option>
+                    <option value="api9">API 9</option>
+                    <option value="api10">API 10</option>
+                </select>
+            </div>
+            <button class="btn music-source-display" id="current-music-source" type="button" title="点击切换音乐源">
+                当前音乐源：--
+            </button>
+            <div class="api-switch-container">
+                <label for="quality-select">选择音质：</label>
+                <select id="quality-select" class="api-select">
+                    <option value="999">无损 (999) - 默认</option>
+                    <option value="740">无损 (740)</option>
+                    <option value="320">320K</option>
+                    <option value="192">192K</option>
+                    <option value="128">128K</option>
+                </select>
+            </div>
+            <button id="quality-switch-btn" class="btn quality-switch-btn" type="button">
+                <i class="fas fa-sort"></i> 最高音质            </button>
+            <!-- 二级设置菜单：收纳常用开关与导入导出 -->
+            <div class="settings-dropdown" id="settings-dropdown">
+                <button class="btn settings-btn" id="settings-btn" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="settings-panel">
+                    <i class="fas fa-gear"></i> 设置
+                </button>
+                <div class="settings-panel" id="settings-panel" aria-hidden="true">
+                    <div class="settings-panel-header">
+                        <span class="settings-panel-title">设置</span>
+                        <button class="settings-close-btn" type="button" aria-label="关闭设置" onclick="closeSettingsMenu()">×</button>
+                    </div>
+                    
+                    <div class="settings-group">
+                        <div class="settings-group-title">播放列表</div>
+                        <button class="btn import-btn" type="button">
+                            <i class="fas fa-upload"></i> 导入
+                        </button>
+                        <button class="btn export-btn" type="button">
+                            <i class="fas fa-download"></i> 导出
+                        </button>
+                    </div>
+                    
+                    <div class="settings-divider"></div>
+                    
+                    <div class="settings-group">
+                        <div class="settings-group-title">开关</div>
+                        <button class="btn" id="motion-toggle-btn" type="button" onclick="toggleMotion()">
+                            <i class="fas fa-film"></i> 动画
+                        </button>
+                        <button class="btn" id="barrage-toggle-btn" type="button" onclick="toggleBarrage()">
+                            🎬 弹幕开关                        </button>
+                        <button class="btn" id="stream-light-toggle-btn" type="button" onclick="toggleStreamLight()">
+                            <i class="fas fa-bolt"></i> 流光开关                        </button>
+                        <button class="btn" id="theme-toggle-btn" type="button" onclick="toggleTheme()">
+                            <i class="fas fa-moon"></i> 深色主题
+                        </button>
+                    </div>
+
+                    <div class="settings-divider"></div>
+
+                    <div class="settings-group">
+                        <div class="settings-group-title">歌词</div>
+                        <button class="btn" id="word-lyrics-toggle-btn" type="button" onclick="toggleWordLyrics()">
+                            <i class="fas fa-highlighter"></i> 逐字歌词：关闭
+                        </button>
+                        <button class="btn" id="lyrics-offset-btn" type="button" onclick="openLyricsOffsetSettings()">
+                            <i class="fas fa-clock"></i> 歌词对齐（提前/延后）                        </button>
+                    </div>
+
+                    <div class="settings-divider"></div>
+
+                    <div class="settings-group">
+                        <div class="settings-group-title">API 7</div>
+                        <button class="btn" id="api7-key-btn" type="button" onclick="openApi7KeySettings()">
+                            <i class="fas fa-key"></i> 设置 API7 Key
+                        </button>
+                    </div>
+
+                    <div class="settings-divider"></div>
+
+                    <div class="settings-group">
+                        <div class="settings-group-title">已添加的歌单</div>
+                        <div id="saved-playlists-container" class="saved-playlists-container"></div>
+                    </div>
+
+                    <div class="settings-divider"></div>
+
+                    <div class="settings-group">
+                        <div class="settings-group-title">代理</div>
+                        <button class="btn" id="proxy-settings-btn" type="button" onclick="openProxySettings()">
+                            <i class="fas fa-network-wired"></i> 设置代理服务                        </button>
+                    </div>
+
+                    <div class="settings-divider"></div>
+
+                    <div class="settings-group">
+                        <div class="settings-group-title">下载</div>
+                        <button class="btn" id="download-capabilities-btn" type="button" onclick="openDownloadCapabilitiesReport()">
+                            <i class="fas fa-chart-simple"></i> 下载能力统计
+                        </button>
+                        <button class="btn" id="download-capabilities-clear-btn" type="button" onclick="clearDownloadCapabilitiesMemory()">
+                            <i class="fas fa-broom"></i> 清除下载记忆
+                        </button>
+                    </div>
+
+                    <div class="settings-divider"></div>
+
+                    <div class="settings-group">
+                        <div class="settings-group-title">彩蛋</div>
+                        <button class="btn" id="v50-btn" type="button" onclick="fetchV50()">
+                            <i class="fas fa-coffee"></i> 疯狂星期四 v50
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主体内容区域 -->
+    <main class="main-content">
+        <!-- 左侧区块：歌曲播放控制区 -->
+        <section class="left-section">
+            <div class="album-cover">
+                <img id="current-cover" src="IMG_20251115_090141.png" alt="专辑封面">
+            </div>
+            
+            <div class="song-info">
+                <h2 id="current-song">未播放歌曲</h2>
+                <p id="current-artist">暂无歌手信息</p>
+                <p id="current-album">暂无专辑信息</p>
+            </div>
+            
+            <div class="progress-container">
+                <span id="current-time">00:00</span>
+                <div class="progress-bar">
+                    <div class="progress" id="progress"></div>
+                </div>
+                <span id="total-time">00:00</span>
+            </div>
+            
+            <div class="play-controls">
+                <button class="control-btn" id="prev-btn" type="button" title="上一首">
+                    <i class="fas fa-step-backward"></i>
+                    <span class="sr-only">上一首</span>
+                </button>
+                <button class="control-btn play-pause-btn" id="play-pause-btn" type="button" title="播放/暂停">
+                    <i class="fas fa-play" id="play-icon"></i>
+                    <span class="sr-only">播放/暂停</span>
+                </button>
+                <button class="control-btn" id="next-btn" type="button" title="下一首">
+                    <i class="fas fa-step-forward"></i>
+                    <span class="sr-only">下一首</span>
+                </button>
+            </div> 
+        </section>
+
+        <!-- 中间区块：歌词展示区 -->
+        <section class="middle-section">
+            <h3 class="section-title">歌词</h3>
+            <div class="lyrics-container" id="lyrics-container">
+                <div class="no-lyrics">
+                    <i class="fas fa-music"></i>
+                    <p>暂无歌词</p>
+                </div>
+            </div>
+
+            <div class="daily-quote-panel" id="daily-quote-panel" role="note" aria-label="每日一言">
+                <div class="daily-quote-head">
+                    <div class="daily-quote-label"><i class="fas fa-comment-dots"></i> 每日一言</div>
+                    <button class="btn daily-quote-refresh-btn" id="daily-quote-refresh-btn" type="button" title="刷新每日一言">
+                        <i class="fas fa-rotate-right"></i> 刷新
+                    </button>
+                </div>
+                <div class="daily-quote-text" id="daily-quote-text">点击“惊喜按钮”获取每日一言</div>
+            </div>
+        </section>
+
+        <!-- 右侧区块：播放列表区 -->
+        <section class="right-section">
+            <div class="playlist-header">
+                <h3 class="section-title">播放列表</h3>
+                <button class="btn delete-all-btn" type="button">
+                    <i class="fas fa-trash"></i> 一键删除                </button>
+            </div>
+            
+            <div class="playlist-container" id="playlist-container">
+                <div class="empty-playlist">
+                    <i class="fas fa-list"></i>
+                    <p>播放列表为空</p>
+                </div>
+            </div>
+            
+            <button class="btn surprise-btn" type="button">
+                <i class="fas fa-gift"></i> 惊喜按钮
+            </button>
+        </section>
+
+    </main>
+
+    <!-- 音频元素 -->
+    <audio id="audio-player" preload="metadata"></audio>
+
+    <!-- 模块化脚本加载 -->
+    <script src="src/utils/polyfills.js"></script>
+    <script src="src/utils/storage.js?v=20260202v3"></script>
+    <script src="src/utils/blobManager.js"></script>
+    <script src="script.js?v=20260209v1"></script>
+</body>
+</html>
+

@@ -1,0 +1,19 @@
+# Rename `name` before deploy (must be unique in your Cloudflare account).
+name = "hjwjb-proxy"
+main = "cloudflare-worker/cloudflare-worker.js"
+compatibility_date = "2026-01-21"
+workers_dev = true
+
+[[kv_namespaces]]
+binding = "HJWJB_KV"
+id = "695c5c84de3642a4a16395805c411d8f"
+
+# Optional alias binding (same KV namespace) for Cloudflare UI examples.
+# If you created a separate KV namespace (e.g. named "my-binding"), replace the id below with that namespace id.
+[[kv_namespaces]]
+binding = "MY_BINDING"
+id = "695c5c84de3642a4a16395805c411d8f"
+#
+# Optional: enable scheduled upstream health checks (the Worker implements scheduled()).
+# [triggers]
+# crons = ["*/5 * * * *"]

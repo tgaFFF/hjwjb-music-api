@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "rewrites": [
+    { "source": "/__health", "destination": "/api/health" },
+    { "source": "/text-proxy", "destination": "/api/text-proxy" },
+    { "source": "/audio-resolve", "destination": "/api/audio-resolve" },
+    { "source": "/audio-proxy", "destination": "/api/audio-proxy" }
+  ]
+}
